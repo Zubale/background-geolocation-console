@@ -115,12 +115,23 @@ export const findOrCreate = async (
     version,
   },
 ) => {
+  console.log('FIND OR CREATE DEVICE', {
+    deviceId,
+    deviceModel,
+    framework,
+    model,
+    uuid,
+    version,
+  })
+
   if ( uuid && uuid.includes('-')){
     uuid = uuid.split('-')[1]; // remove the device brand
   }
   if ( uuid && uuid.includes('(')){
     uuid = uuid.replace('(', '').replace(')', ''); // remove brackets
   }
+
+  console.log('FINALLY', { uuid })
 
   const device = {
     device_id: uuid || deviceId || 'UNKNOWN',
