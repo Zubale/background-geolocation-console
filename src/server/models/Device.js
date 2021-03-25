@@ -115,16 +115,15 @@ export const findOrCreate = async (
     version,
   },
 ) => {
-  if ( deviceId && deviceId.includes('-')){
-    deviceId = deviceId.split('-')[1]; // remove the device brand
+  if ( uuid && uuid.includes('-')){
+    uuid = uuid.split('-')[1]; // remove the device brand
   }
-  if ( deviceId && deviceId.includes('(')){
-    deviceId = deviceId.replace('(', '').replace(')', ''); // remove brackets
+  if ( uuid && uuid.includes('(')){
+    uuid = uuid.replace('(', '').replace(')', ''); // remove brackets
   }
 
   const device = {
-    // device_id: uuid || deviceId || 'UNKNOWN',
-    device_id: deviceId || 'UNKNOWN',
+    device_id: uuid || deviceId || 'UNKNOWN',
     device_model: model || deviceModel || 'UNKNOWN',
   };
   const now = new Date();
