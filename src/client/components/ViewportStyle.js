@@ -50,9 +50,12 @@ const useStyles = makeStyles(theme => ({
     wordWrap: 'break-word',
   },
   actionRow: {
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: '#1FBAFC',
     display: 'flex',
     flexDirection: 'row',
+  },
+  containedPrimary: {
+    backgroundColor: 'blue'
   },
   logout: { width: '60px', color: 'white' },
   tabPanel: {

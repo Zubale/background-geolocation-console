@@ -8,6 +8,9 @@ const useStyles = makeStyles(theme => ({
     marginTop: 10,
     // marginBottom: 10,
   },
+  button: {
+    backgroundColor: '#11008e'
+  },
   relative: { position: 'relative' },
   switch: {
     margin: 0,

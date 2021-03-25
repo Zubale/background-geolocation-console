@@ -39,7 +39,15 @@ class CustomMarkers extends React.Component {
     } = this.state;
     const latlng = position.replace(/\s+/, '').split(',');
     const { onAddTestMarker } = this.props;
-
+    console.log({
+      type: !radius.length ? 'location' : 'geofence',
+      label,
+      position: {
+        lat: parseFloat(latlng[0], 10),
+        lng: parseFloat(latlng[1], 10),
+      },
+      radius: parseInt(radius, 10),
+    })
     onAddTestMarker({
       type: !radius.length ? 'location' : 'geofence',
       label,

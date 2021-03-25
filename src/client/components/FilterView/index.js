@@ -195,7 +195,7 @@ const FilterView = ({
               </div>
               <Button
                 fullWidth
-                className={classes.paddingRow}
+                className={[classes.paddingRow, classes.button]}
                 variant='contained'
                 color='primary'
                 onClick={onReload}

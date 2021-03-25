@@ -49,8 +49,11 @@ const Viewport = ({
   location,
   logout,
 }: Props) => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const hide_drawer = urlParams.get('hide_drawer');
+
   const [tabIndex, setTabIndex] = useState(activeTabIndex);
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(hide_drawer === '1' ? false : true);
   const classes = useStyles();
 
   return (
@@ -64,6 +67,7 @@ const Viewport = ({
       >
         <div className={classes.actionRow}>
           <Tabs
+            TabIndicatorProps={{ style: { background: "#FFFD37", height: 4 } }}
             className={classes.tabs}
             value={tabIndex}
             onChange={(e: Event, index: number) => setTabIndex(index)}
