@@ -44,6 +44,19 @@ export async function getStats(org) {
   };
 }
 
+async function getDeviceId(device_id, company_id){
+  const whereConditions = { device_id, company_id};
+  const result = await DeviceModel.findOne({
+    where: whereConditions,
+    attributes: [
+      'id',
+      'device_id',
+    ],
+    raw: true,
+  });
+  return result.id;
+}
+
 export async function getLocations(params, isAdmin) {
   if (!isAdmin && !(params.device_id || params.company_id)) {
     return [];
@@ -53,8 +66,8 @@ export async function getLocations(params, isAdmin) {
   if (params.start_date && params.end_date) {
     whereConditions.recorded_at = { [Op.between]: [new Date(params.start_date), new Date(params.end_date)] };
   }
-
-  params.device_id && (whereConditions.device_id = +params.device_id);
+  const device_id = await getDeviceId(params.device_id, params.company_id)
+  params.device_id && (whereConditions.device_id = +device_id);
   withAuth && params.company_id && (whereConditions.company_id = +params.company_id);
 
   const rows = await LocationModel.findAll({
@@ -79,7 +92,9 @@ export async function getLatestLocation(params, isAdmin) {
   const whereConditions = {};
 
   withAuth && (whereConditions.company_id = companyId);
-  deviceId && (whereConditions.device_id = +deviceId);
+  // deviceId && (whereConditions.device_id = device_id);
+  const device_id = await getDeviceId(deviceId, companyId)
+  whereConditions.device_id = device_id;
 
   const row = await LocationModel.findOne({
     where: whereConditions,
