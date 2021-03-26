@@ -125,7 +125,7 @@ export const findOrCreate = async (
   })
 
   if ( uuid && uuid.includes('-')){
-    uuid_parts = uuid.split('-')
+    let uuid_parts = uuid.split('-')
     uuid = uuid_parts[uuid_parts.length-1]; // remove the device brand
   }
   if ( uuid && uuid.includes('(')){
