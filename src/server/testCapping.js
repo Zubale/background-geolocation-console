@@ -31,7 +31,7 @@ async function main() {
     const orgName = o !== 4 ? 'o' + o : 'transistor-test';
     const deviceId = 'd1';
     const company = await Org.findOrCreate({ org: orgName });
-    const device = await Device.findOrCreate(orgName, { device_id: deviceId });
+    const device = await Device.findOrCreate(orgName, { user_id: deviceId });
     for (let k = 0; k < 10500; k++) {
       const time = new Date().getTime() - Math.random() * 90 * 1000 * 86400;
       const location = { ...locationDefaults, timestamp: new Date(time).toISOString() };
@@ -44,7 +44,7 @@ async function main() {
     const orgName = o !== 4 ? 'o' + o : 'transistor-test';
     const deviceId = 'd1';
     const company = await Org.findOrCreate({ org: orgName });
-    const device = await Device.findOrCreate(orgName, { device_id: deviceId });
+    const device = await Device.findOrCreate(orgName, { user_id: deviceId });
     const statsBefore = await Location.getStats(orgName);
     await Location.removeOld(orgName);
     const statsAfter = await Location.getStats(orgName);

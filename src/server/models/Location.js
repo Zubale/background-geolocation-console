@@ -44,13 +44,13 @@ export async function getStats(org) {
   };
 }
 
-async function getDeviceId(device_id, company_id){
-  const whereConditions = { device_id, company_id};
+async function getDeviceId(user_id, company_id){
+  const whereConditions = { user_id, company_id};
   const result = await DeviceModel.findOne({
     where: whereConditions,
     attributes: [
       'id',
-      'device_id',
+      'user_id',
     ],
     raw: true,
   });
@@ -58,7 +58,7 @@ async function getDeviceId(device_id, company_id){
 }
 
 export async function getLocations(params, isAdmin) {
-  if (!isAdmin && !(params.device_id || params.company_id)) {
+  if (!isAdmin && !(params.user_id || params.company_id)) {
     return [];
   }
 
@@ -66,8 +66,8 @@ export async function getLocations(params, isAdmin) {
   if (params.start_date && params.end_date) {
     whereConditions.recorded_at = { [Op.between]: [new Date(params.start_date), new Date(params.end_date)] };
   }
-  const device_id = await getDeviceId(params.device_id, params.company_id)
-  params.device_id && (whereConditions.device_id = +device_id);
+  const user_id = await getDeviceId(params.user_id, params.company_id)
+  params.user_id && (whereConditions.user_id = +user_id);
   withAuth && params.company_id && (whereConditions.company_id = +params.company_id);
 
   const rows = await LocationModel.findAll({
@@ -84,7 +84,7 @@ export async function getLocations(params, isAdmin) {
 export async function getLatestLocation(params, isAdmin) {
   const {
     company_id: companyId,
-    device_id: deviceId,
+    user_id: deviceId,
   } = params || {};
   if (!isAdmin && !(deviceId || companyId)) {
     return [];
@@ -92,9 +92,9 @@ export async function getLatestLocation(params, isAdmin) {
   const whereConditions = {};
 
   withAuth && (whereConditions.company_id = companyId);
-  // deviceId && (whereConditions.device_id = device_id);
-  const device_id = await getDeviceId(deviceId, companyId)
-  whereConditions.device_id = device_id;
+  // deviceId && (whereConditions.user_id = user_id);
+  const user_id = await getDeviceId(deviceId, companyId)
+  whereConditions.user_id = user_id;
 
   const row = await LocationModel.findOne({
     where: whereConditions,
@@ -124,7 +124,7 @@ export async function createLocation(location, device, org) {
     'org:id'.green,
     device.company_id,
     'device:id'.green,
-    device.device_id,
+    device.user_id,
   );
   const row = {
     latitude: location.coords.latitude,
@@ -133,7 +133,7 @@ export async function createLocation(location, device, org) {
     recorded_at: location.timestamp,
     created_at: now.toISOString(),
     company_id: device.company_id,
-    device_id: device.id,
+    user_id: device.id,
   };
   console.info('v1:location:create'.green, JSON.stringify(device), JSON.stringify(row));
   return LocationModel.create(row);
@@ -231,7 +231,7 @@ export async function create(
     manufacturer: manufacturer || propDevice.manufacturer || dev.manufacturer,
     model: model || propDevice.model || propDevice.device_model || dev.device_model || dev.model || 'UNKNOWN',
     platform: platform || propDevice.platform || dev.platform,
-    uuid: uuid || propDevice.device_id || propDevice.uuid || dev.uuid || dev.device_id || 'UNKNOWN',
+    uuid: uuid || propDevice.user_id || propDevice.uuid || dev.uuid || dev.user_id || 'UNKNOWN',
     version: version || propDevice.version || dev.version,
   };
   const deviceId = propDevice.id || dev.id;
@@ -280,15 +280,15 @@ export async function deleteLocations(params, isAdmin) {
   const whereConditions = {};
   const verify = {};
   const companyId = params && params.companyId;
-  const deviceId = params && (params.deviceId || params.device_id);
+  const deviceId = params && (params.deviceId || params.user_id);
 
   if (!isAdmin) {
     whereConditions.company_id = +companyId;
     verify.company_id = +companyId;
   }
   if (params && deviceId) {
-    whereConditions.device_id = +deviceId;
-    verify.device_id = +deviceId;
+    whereConditions.user_id = +deviceId;
+    verify.user_id = +deviceId;
   }
   if (params && params.start_date && params.end_date) {
     whereConditions.recorded_at = { $between: [params.start_date, params.end_date] };
@@ -302,20 +302,20 @@ export async function deleteLocations(params, isAdmin) {
 
   if (params.deviceId) {
     const locationsCount = await LocationModel.count({ where: verify });
-    if (!locationsCount && verify.device_id) {
-      await DeviceModel.destroy({ where: { id: verify.device_id } });
+    if (!locationsCount && verify.user_id) {
+      await DeviceModel.destroy({ where: { id: verify.user_id } });
     }
   } else if (companyId) {
     const devices = await LocationModel.findAll({
-      attributes: ['company_id', 'device_id'],
+      attributes: ['company_id', 'user_id'],
       where: verify,
-      group: ['company_id', 'device_id'],
+      group: ['company_id', 'user_id'],
       raw: true,
     });
     const group = {};
     devices.forEach(
       x => (group[x.company_id] = (group[x.company_id] || []).concat([
-        x.device_id,
+        x.user_id,
       ])),
     );
     const queries = Object.keys(group)

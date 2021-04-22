@@ -46,7 +46,7 @@ export async function getLocations(params, isAdmin) {
     org,
     end_date: endDate,
     start_date: startDate,
-    device_id: deviceId,
+    user_id: deviceId,
   } = params || {};
 
   if (!isAdmin && !(deviceId || org)) {
@@ -56,7 +56,7 @@ export async function getLocations(params, isAdmin) {
   if (!withAuth) {
     const devicesGroup = firestore.collectionGroup('Devices');
     const devices = deviceId
-      ? await devicesGroup.where('device_id', '==', deviceId).get()
+      ? await devicesGroup.where('user_id', '==', deviceId).get()
       : await devicesGroup.get();
     const requests = [];
     devices.forEach(device => requests.push(device.ref.collection('Locations')));
@@ -100,7 +100,7 @@ export async function getLatestLocation(params, isAdmin) {
   if (!withAuth) {
     const devicesGroup = firestore.collectionGroup('Devices');
     const devices = await devicesGroup
-      .where('device_id', '==', deviceId)
+      .where('user_id', '==', deviceId)
       .limit(1)
       .get();
     const device = !devices.empty && devices.docs[0];
@@ -129,14 +129,14 @@ export async function getLatestLocation(params, isAdmin) {
 
 export async function createLocation(location, device, org, batch) {
   const now = new Date();
-  const { device_id: deviceId } = device;
+  const { user_id: deviceId } = device;
 
   console.info(
     'v3:location:create'.green,
     'org:name'.green,
     org,
     'device:id'.green,
-    device.device_id,
+    device.user_id,
   );
 
   const orgRef = firestore
@@ -227,7 +227,7 @@ export async function create(params, org, dev = {}) {
     manufacturer: manufacturer || propDevice.manufacturer || dev.manufacturer,
     model: model || propDevice.model || propDevice.device_model || dev.device_model || dev.model || 'UNKNOWN',
     platform: platform || propDevice.platform || dev.platform,
-    uuid: uuid || propDevice.device_id || propDevice.uuid || dev.uuid || dev.device_id || 'UNKNOWN',
+    uuid: uuid || propDevice.user_id || propDevice.uuid || dev.uuid || dev.user_id || 'UNKNOWN',
     version: version || propDevice.version || dev.version,
   };
   const token = org ||
@@ -272,7 +272,7 @@ export async function deleteLocations(params, isAdmin) {
     org,
     end_date: endDate,
     start_date: startDate,
-    device_id: deviceId,
+    user_id: deviceId,
   } = params || {};
 
   if (!isAdmin && !(org || deviceId)) {

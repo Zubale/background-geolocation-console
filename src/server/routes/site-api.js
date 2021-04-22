@@ -113,13 +113,13 @@ router.get('/stats', checkAuth(verify), async (req, res) => {
 
 router.get('/locations/latest', checkAuth(verify), async (req, res) => {
   const { org, companyId: orgId } = req.jwt;
-  const { company_id: companyId = orgId, device_id: deviceId } = req.query;
+  const { company_id: companyId = orgId, user_id: deviceId } = req.query;
   const admin = isAdmin(req.jwt);
   console.log('v1: GET /locations/latest %s'.green, org, companyId, deviceId);
   try {
     const latest = await getLatestLocation(
       {
-        device_id: deviceId,
+        user_id: deviceId,
         org,
         company_id: admin ? companyId : orgId,
       },

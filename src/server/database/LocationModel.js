@@ -15,14 +15,14 @@ const LocationModel = definedSequelizeDb
     timestamps: false,
     indexes: [
       { fields: ['recorded_at'] },
-      { fields: ['device_id'] },
-      { fields: ['company_id', 'device_id', 'recorded_at'] },
+      { fields: ['user_id'] },
+      { fields: ['company_id', 'user_id', 'recorded_at'] },
     ],
   })
   : {};
 
 LocationModel.associate = models => {
-  models.Location.belongsTo(models.Device, { foreignKey: 'device_id' });
+  models.Location.belongsTo(models.Device, { foreignKey: 'user_id' });
   models.Location.belongsTo(models.Company, { foreignKey: 'company_id' });
 };
 

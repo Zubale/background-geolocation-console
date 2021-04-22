@@ -17,7 +17,8 @@ const DeviceModel = definedSequelizeDb
       },
       // , references: { model: 'companies' }
       company_token: { type: Sequelize.TEXT },
-      device_id: { type: Sequelize.TEXT },
+      user_id: { type: Sequelize.TEXT },
+      phone: { type: Sequelize.TEXT },
       device_model: { type: Sequelize.TEXT },
       created_at: { type: Sequelize.DATE },
       framework: { type: Sequelize.TEXT },
@@ -27,7 +28,8 @@ const DeviceModel = definedSequelizeDb
     {
       timestamps: false,
       indexes: [
-        { fields: ['device_id'] },
+        { fields: ['user_id'] },
+        { fields: ['phone'] },
         { fields: ['company_id'] },
         { fields: ['company_token'] },
       ],
@@ -36,7 +38,7 @@ const DeviceModel = definedSequelizeDb
   : {};
 
 DeviceModel.associate = models => {
-  models.Device.hasMany(models.Location, { foreignKey: 'device_id' });
+  models.Device.hasMany(models.Location, { foreignKey: 'user_id' });
 };
 
 export default DeviceModel;

@@ -9,16 +9,16 @@ import { desc, withAuth } from '../config';
 import { findOrCreate as findOrCreateCompany } from './Org';
 
 export async function getDevice({
-  id, device_id: deviceId, org,
+  id, user_id: deviceId, org,
 }) {
   const whereConditions = id
     ? { id, company_token: org }
-    : { device_id: deviceId, company_token: org };
+    : { user_id: deviceId, company_token: org };
   const result = await DeviceModel.findOne({
     where: whereConditions,
     attributes: [
       'id',
-      'device_id',
+      'user_id',
       'device_model',
       'company_id',
       'company_token',
@@ -46,7 +46,7 @@ export async function getDevices(params, isAdmin) {
     where: whereConditions,
     attributes: [
       'id',
-      'device_id',
+      'user_id',
       'device_model',
       'company_id',
       'company_token',
@@ -72,11 +72,11 @@ export async function deleteDevice(
 ) {
   const device = await DeviceModel.findOne({
     where: !isAdmin
-      ? { company_token: org, device_id: deviceId }
-      : { device_id: deviceId },
+      ? { company_token: org, user_id: deviceId }
+      : { user_id: deviceId },
     attributes: [
       'id',
-      'device_id',
+      'user_id',
       'device_model',
       'company_id',
       'company_token',
@@ -88,7 +88,7 @@ export async function deleteDevice(
     return null;
   }
 
-  const whereByDevice = { device_id: device.id };
+  const whereByDevice = { user_id: device.id };
   const where = { ...whereByDevice };
   if (startDate && endDate && new Date(startDate) && new Date(endDate)) {
     where.recorded_at = { [Op.between]: [new Date(startDate), new Date(endDate)] };
@@ -107,7 +107,7 @@ export async function deleteDevice(
 export const findOrCreate = async (
   org = 'UNKNOWN',
   {
-    device_id: deviceId,
+    user_id: deviceId,
     device_model: deviceModel,
     framework,
     model,
@@ -146,7 +146,7 @@ export const findOrCreate = async (
   console.log('FINALLY', { uuid, phone })
 
   const device = {
-    device_id: uuid || deviceId || 'UNKNOWN',
+    user_id: uuid || deviceId || 'UNKNOWN',
     device_model: model || deviceModel || 'UNKNOWN',
   };
   const now = new Date();
@@ -154,13 +154,13 @@ export const findOrCreate = async (
   checkCompany({ org, model: device.device_model });
 
   const company = await findOrCreateCompany({ org });
-  const where = { company_id: company.id, device_id: device.device_id };
+  const where = { company_id: company.id, user_id: device.user_id };
   const [row] = await DeviceModel.findOrCreate({
     where,
     defaults: {
       company_id: company.id,
       company_token: org,
-      device_id: device.device_id,
+      user_id: device.user_id,
       device_model: device.device_model,
       phone,
       created_at: now,

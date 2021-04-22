@@ -11,5 +11,5 @@ export default {
   recorded_at: { type: Sequelize.DATE },
   created_at: { type: Sequelize.DATE },
   company_id: { type: Sequelize.INTEGER },
-  device_id: { type: Sequelize.INTEGER },
+  user_id: { type: Sequelize.INTEGER },
 };

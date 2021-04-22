@@ -47,7 +47,7 @@ router.post('/register', async (req, res) => {
     framework,
     manufacturer,
     model,
-    device_id: devId,
+    user_id: devId,
     device_model: deviceModel,
     org,
     uuid,
@@ -208,7 +208,7 @@ router.delete('/devices/:id', checkAuth(verify), async (req, res) => {
   try {
     await deleteDevice({
       end_date: endDate,
-      device_id: deviceId,
+      user_id: deviceId,
       org: admin ? orgId : admin,
       start_date: startDate,
     });
@@ -235,7 +235,7 @@ router.get('/locations/latest', checkAuth(verify), async (req, res) => {
   const { org, admin } = req.jwt;
   const {
     company_id: orgId = org,
-    device_id: deviceId,
+    user_id: deviceId,
   } = req.query;
   // eslint-disable-next-line no-console
   console.info(
@@ -266,7 +266,7 @@ router.get('/locations', checkAuth(verify), async (req, res) => {
   const { org, admin } = req.jwt;
   const {
     company_id: orgId,
-    device_id: deviceId = 'UNKNOWN',
+    user_id: deviceId = 'UNKNOWN',
   } = req.query;
   const name = admin ? orgId : org;
   // eslint-disable-next-line no-console
@@ -281,7 +281,7 @@ router.get('/locations', checkAuth(verify), async (req, res) => {
   const { end_date: endDate, start_date: startDate } = req.params;
   try {
     const locations = await getLocations({
-      device_id: deviceId,
+      user_id: deviceId,
       end_date: endDate,
       org: name,
       start_date: startDate,
@@ -300,7 +300,7 @@ router.get('/locations', checkAuth(verify), async (req, res) => {
 router.post('/locations', checkAuth(verify), async (req, res) => {
   const { org, uuid } = req.jwt;
   const { body } = req;
-  const device = await getDevice({ device_id: uuid, org });
+  const device = await getDevice({ user_id: uuid, org });
   const data = isEncryptedRequest(req)
     ? decrypt(body.toString())
     : body;
@@ -320,7 +320,7 @@ router.post('/locations', checkAuth(verify), async (req, res) => {
   if (!device) {
     console.error('Device ID %s not found.  Was it deleted from dashboard?'.red, `Orgs\\${org}\\Devices\\${uuid}`);
     return res.status(410)
-      .send({ error: 'DEVICE_ID_NOT_FOUND', background_geolocation: ['stop'] });
+      .send({ error: 'user_id_NOT_FOUND', background_geolocation: ['stop'] });
   }
 
   if (isDDosCompany(org)) {
@@ -349,7 +349,7 @@ router.post('/locations', checkAuth(verify), async (req, res) => {
 router.post('/locations/:company_token', checkAuth(verify), async (req, res) => {
   const { org, uuid } = req.jwt;
   const { company_token: orgId } = req.params;
-  const device = await getDevice({ device_id: uuid, org: orgId || org });
+  const device = await getDevice({ user_id: uuid, org: orgId || org });
 
   // eslint-disable-next-line no-console
   console.info(
@@ -387,7 +387,7 @@ router.post('/locations/:company_token', checkAuth(verify), async (req, res) => 
 router.delete('/locations', checkAuth(verify), async (req, res) => {
   try {
     const { org, admin } = req.jwt;
-    const { device_id: deviceId, company_id: orgId } = req.query;
+    const { user_id: deviceId, company_id: orgId } = req.query;
 
     // eslint-disable-next-line no-console
     console.info(
@@ -403,7 +403,7 @@ router.delete('/locations', checkAuth(verify), async (req, res) => {
 
     await deleteLocations({
       org: admin ? orgId : org,
-      device_id: deviceId,
+      user_id: deviceId,
       end_date: endDate,
       start_date: startDate,
     });

@@ -33,11 +33,11 @@ import { getOrgs } from '../models/Org';
 const router = new Router();
 
 // curl -v -X POST http://localhost:9000/v2/register \
-//  -d '{"company_token":"test","device_id":"test"}' \
+//  -d '{"company_token":"test","user_id":"test"}' \
 //  -H 'Content-Type: application/json'
 router.post('/register', async (req, res) => {
   const {
-    device_id: devId,
+    user_id: devId,
     device_model: deviceModel,
     framework,
     manufacturer,
@@ -235,7 +235,7 @@ router.get('/stats', checkAuth(verify), async (req, res) => {
 router.get('/locations/latest', checkAuth(verify), async (req, res) => {
   const { org } = req.jwt;
   let { deviceId } = req.jwt;
-  ({ device_id: deviceId = deviceId } = req.query);
+  ({ user_id: deviceId = deviceId } = req.query);
   let { companyId } = req.jwt;
   !companyId && ({ company_id: companyId } = await getDevice({ id: deviceId, org }) || {});
   // eslint-disable-next-line no-console
@@ -250,7 +250,7 @@ router.get('/locations/latest', checkAuth(verify), async (req, res) => {
   );
   try {
     const latest = await getLatestLocation({
-      device_id: +deviceId,
+      user_id: +deviceId,
       company_id: +companyId,
     });
     return res.send(latest);
@@ -267,7 +267,7 @@ router.get('/locations/latest', checkAuth(verify), async (req, res) => {
 router.get('/locations', checkAuth(verify), async (req, res) => {
   const { org } = req.jwt;
   let { deviceId } = req.jwt;
-  ({ device_id: deviceId = deviceId } = req.query);
+  ({ user_id: deviceId = deviceId } = req.query);
   // eslint-disable-next-line no-console
   console.info(
     'v2:locations:get'.green,
@@ -314,7 +314,7 @@ router.post('/locations', checkAuth(verify), async (req, res) => {
     // eslint-disable-next-line no-console
     console.error('Device ID %s not found.  Was it deleted from dashboard?'.red, deviceId);
     return res.status(410)
-      .send({ error: 'DEVICE_ID_NOT_FOUND', background_geolocation: ['stop'] });
+      .send({ error: 'user_id_NOT_FOUND', background_geolocation: ['stop'] });
   }
 
   if (isDDosCompany(org)) {
@@ -366,7 +366,7 @@ router.post('/locations/:company_token', checkAuth(verify), async (req, res) => 
   if (!device) {
     console.error('Device ID %s not found.  Was it deleted from dashboard?'.red, deviceId);
     return res.status(410)
-      .send({ error: 'DEVICE_ID_NOT_FOUND', background_geolocation: ['stop'] });
+      .send({ error: 'user_id_NOT_FOUND', background_geolocation: ['stop'] });
   }
 
   if (isDDosCompany(org || orgId)) {

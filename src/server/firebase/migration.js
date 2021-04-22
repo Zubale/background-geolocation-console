@@ -50,15 +50,15 @@ export const transfer = async () => {
       raw: true,
     });
     await Promise.reduce(devices, async (pp, dev) => {
-      console.log('Org/', x.company_token, '/Devices/', dev.device_id);
+      console.log('Org/', x.company_token, '/Devices/', dev.user_id);
 
-      const devRef = devsRef.doc(dev.device_id);
+      const devRef = devsRef.doc(dev.user_id);
       const locsRef = devRef.collection('Locations');
       const response = await locsRef.get();
       const locs = toRows(response);
       const locations = await LocationModel.findAll({
         where: {
-          device_id: dev.id,
+          user_id: dev.id,
           id: {
             [Op.notIn]: locs
               .map(loc => +loc.id)
@@ -71,7 +71,7 @@ export const transfer = async () => {
       await batch.set(devRef, dev);
       counter = await checkLimit(counter, batch);
       await Promise.reduce(locations, async (ppp, loc) => {
-        console.log('Org/', x.company_token, '/Devices/', dev.device_id, '/Locations/', loc.id);
+        console.log('Org/', x.company_token, '/Devices/', dev.user_id, '/Locations/', loc.id);
         const locRef = locsRef.doc(`${loc.id}`);
         await batch.set(locRef, loc);
         counter = await checkLimit(counter, batch);
@@ -124,7 +124,7 @@ export default async ({ uuid, org }) => {
       await ref.set({
         company_token: org,
         created_at: now,
-        device_id: uuid,
+        user_id: uuid,
         // uuid,
       });
       await ref
@@ -175,14 +175,14 @@ export default async ({ uuid, org }) => {
     console.log('locations', org, uuid, toRows(locations));
 
     const devicesSort = await firestore.collectionGroup('Devices')
-      .where('device_id', '==', uuid)
+      .where('user_id', '==', uuid)
       .orderBy('updated_at', 'desc')
       .get();
 
     console.log('devices', uuid, 'updated_at:desc', toRows(devicesSort));
 
     const devices = await firestore.collectionGroup('Devices')
-      .where('device_id', '==', uuid)
+      .where('user_id', '==', uuid)
       .limit(1)
       .get();
     console.log('devices', uuid, toRows(devices));

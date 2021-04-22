@@ -10,7 +10,7 @@ import {
 import { withAuth } from '../config';
 import { toRows, toRow } from '../libs/utils';
 
-export async function getDevice({ device_id: deviceId, org }) {
+export async function getDevice({ user_id: deviceId, org }) {
   try {
     const snapshot = await firestore
       .collection('Org').doc(org)
@@ -51,7 +51,7 @@ export async function getDevices({ org }, isAdmin) {
 }
 
 export async function deleteDevice({
-  device_id: deviceId,
+  user_id: deviceId,
   start_date: startDate,
   end_date: endDate,
   org,
@@ -78,7 +78,7 @@ export async function deleteDevice({
 export const findOrCreate = async (
   org = 'UNKNOWN',
   {
-    device_id: deviceId,
+    user_id: deviceId,
     device_model: deviceModel,
     framework,
     model,
@@ -88,13 +88,13 @@ export const findOrCreate = async (
   },
 ) => {
   const dev = {
-    device_id: uuid || deviceId || 'UNKNOWN',
+    user_id: uuid || deviceId || 'UNKNOWN',
     device_model: model || deviceModel || 'UNKNOWN',
   };
   const now = new Date();
   const ref = await firestore
     .collection('Org').doc(org)
-    .collection('Devices').doc(dev.device_id);
+    .collection('Devices').doc(dev.user_id);
   const snapshot = await ref.get();
   const device = omitBy(
     {

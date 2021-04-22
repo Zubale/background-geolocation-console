@@ -40,7 +40,7 @@ service cloud.firestore {
 Please add Single field exemptions for device filter:
 
  * Collection: `Devices`
- * Field: `device_id`, `updated_at`
+ * Field: `user_id`, `updated_at`
  * Query scope: `Collection group`
 
 ![Single field exemptions](./single-field-exemptions.png)
