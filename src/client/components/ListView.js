@@ -24,7 +24,7 @@ type LocationRow = {|
   company_id: number,
   coordinate: string,
   created_at: string,
-  device_id: number,
+  user_id: number,
   event: string,
   is_moving: string,
   odometer: number,
@@ -58,7 +58,7 @@ const getRowData = (location: Location): LocationRow => {
   }
   return {
     uuid: location.uuid,
-    device_id: +location.device_id,
+    user_id: +location.user_id,
     company_id: location.company_id,
     coordinate:
       `${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}`,

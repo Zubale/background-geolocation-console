@@ -71,7 +71,7 @@ describe('site api', () => {
     test('/locations/latest', async () => {
       const res = await chai
         .request(server)
-        .get('/api/site/locations/latest?device_id=372')
+        .get('/api/site/locations/latest?user_id=372')
         .set('Authorization', `Bearer ${token}`);
       expect(res).have.status(200);
       expect(res).to.be.json;
@@ -122,7 +122,7 @@ describe('site api', () => {
     test('/locations', async () => {
       const res = await chai
         .request(server)
-        .get('/api/site/locations?device_id=')
+        .get('/api/site/locations?user_id=')
         .set('Authorization', `Bearer ${token}`);
 
       expect(res).have.status(200);
@@ -215,7 +215,7 @@ describe('site api', () => {
         .delete(
           `/api/site/locations?${
             queryString.stringify({
-              device_id: 371,
+              user_id: 371,
               start_date: location.timestamp.substr(0, 10),
               end_date: new Date().toISOString().substr(0, 10),
             })}`,

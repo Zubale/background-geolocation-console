@@ -135,7 +135,7 @@ describe('jwt api', () => {
     test('/locations/latest', async () => {
       const res = await chai
         .request(server)
-        .get('/api/jwt/locations/latest?device_id=372')
+        .get('/api/jwt/locations/latest?user_id=372')
         .set('Authorization', `Bearer ${token}`);
       expect(res).have.status(200);
     });

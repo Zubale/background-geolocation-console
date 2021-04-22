@@ -25,7 +25,7 @@ CREATE TABLE if not exists public.devices (
     id integer NOT NULL,
     company_id integer,
     company_token text,
-    device_id text,
+    user_id text,
     device_model text,
     created_at timestamp with time zone,
     framework text,
@@ -59,7 +59,7 @@ CREATE TABLE if not exists public.locations (
     recorded_at timestamp with time zone,
     created_at timestamp with time zone,
     company_id integer,
-    device_id integer,
+    user_id integer,
     data jsonb,
     uuid text
 );
@@ -107,10 +107,10 @@ END $$ LANGUAGE plpgsql;
 
 CREATE INDEX if not exists devices_company_id ON public.devices USING btree (company_id);
 CREATE INDEX if not exists devices_company_token ON public.devices USING btree (company_token);
-CREATE INDEX if not exists devices_device_id ON public.devices USING btree (device_id);
-CREATE INDEX if not exists locations_company_id_device_id_recorded_at ON public.locations USING btree (company_id, device_id, recorded_at);
-CREATE INDEX if not exists locations_company_id_device_ref_id_recorded_at ON public.locations USING btree (company_id, device_id, recorded_at);
-CREATE INDEX if not exists locations_device_id ON public.locations USING btree (device_id);
+CREATE INDEX if not exists devices_user_id ON public.devices USING btree (user_id);
+CREATE INDEX if not exists locations_company_id_user_id_recorded_at ON public.locations USING btree (company_id, user_id, recorded_at);
+CREATE INDEX if not exists locations_company_id_device_ref_id_recorded_at ON public.locations USING btree (company_id, user_id, recorded_at);
+CREATE INDEX if not exists locations_user_id ON public.locations USING btree (user_id);
 CREATE INDEX if not exists locations_recorded_at ON public.locations USING btree (recorded_at);
 
 DO $$
@@ -143,7 +143,7 @@ BEGIN
 
   BEGIN
     ALTER TABLE ONLY public.locations
-       ADD CONSTRAINT locations_device_id_fkey FOREIGN KEY (device_id) REFERENCES public.devices(id) ON UPDATE CASCADE ON DELETE CASCADE;
+       ADD CONSTRAINT locations_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.devices(id) ON UPDATE CASCADE ON DELETE CASCADE;
   EXCEPTION
     WHEN others THEN RAISE NOTICE 'Table fk constraint public.locations:device already exists';
   END;

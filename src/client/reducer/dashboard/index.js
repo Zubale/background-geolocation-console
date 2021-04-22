@@ -56,7 +56,7 @@ export type Location = {|
   battery_level: number,
   company_id: number,
   created_at: string,
-  device_id: string,
+  user_id: string,
   event: string,
   heading: number,
   is_moving: string,
@@ -402,7 +402,7 @@ export const loadDevices = (): ThunkAction => async (dispatch: Dispatch, getStat
     const records = await response.json();
     const devices: Device[] = records
       .map(({
-        id, device_id: deviceId, framework,
+        id, user_id: deviceId, framework,
       }: Object) => ({
         id: `${deviceId}`,
         name: `${deviceId}`
@@ -430,7 +430,7 @@ export const loadLocations = (): ThunkAction => async (dispatch: Dispatch, getSt
   const params = qs.stringify({
     company_id: companyId,
     company_token: orgToken || companyId,
-    device_id: deviceId,
+    user_id: deviceId,
     end_date: endDate.toISOString(),
     limit: maxMarkers,
     start_date: startDate.toISOString(),
@@ -455,7 +455,7 @@ export const loadCurrentLocation = (): ThunkAction => async (dispatch: Dispatch,
   } = getState();
   if (deviceId) {
     const params = qs.stringify({
-      device_id: deviceId,
+      user_id: deviceId,
       company_id: companyId,
       company_token: orgToken || companyId,
     });

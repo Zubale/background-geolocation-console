@@ -134,7 +134,7 @@ describe('firebase api', () => {
     test('/locations/latest', async () => {
       const res = await chai
         .request(server)
-        .get('/api/firebase/locations/latest?device_id=uuid')
+        .get('/api/firebase/locations/latest?user_id=uuid')
         .set('Authorization', `Bearer ${token}`);
       expect(res).have.status(200);
     });
@@ -229,7 +229,7 @@ describe('firebase api', () => {
         .delete(
           `/api/firebase/locations?${
             queryString.stringify({
-              device_id: 'iPhone10-4(x86_64)-13-3',
+              user_id: 'iPhone10-4(x86_64)-13-3',
               start_date: location.timestamp.substr(0, 10),
               end_date: new Date().toISOString().substr(0, 10),
             })}`,
