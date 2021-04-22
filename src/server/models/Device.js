@@ -127,7 +127,7 @@ export const findOrCreate = async (
 
   // new version that has object with phone and zubale uid
   if ( uuid && uuid.includes('{"') ) {
-    let matches = text.match(/\{(.*?)\}/);
+    let matches = uuid.match(/\{(.*?)\}/);
     if (matches) {
       let payload = JSON.parse(`{${matches[1]}}`);
       uuid = payload.userId
