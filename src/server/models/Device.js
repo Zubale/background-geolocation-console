@@ -123,16 +123,27 @@ export const findOrCreate = async (
     uuid,
     version,
   })
+  let phone  = ''
 
-  if ( uuid && uuid.includes('-')){
-    let uuid_parts = uuid.split('-')
-    uuid = uuid_parts[uuid_parts.length-1]; // remove the device brand
-  }
-  if ( uuid && uuid.includes('(')){
-    uuid = uuid.replace('(', '').replace(')', ''); // remove brackets
+  // new version that has object with phone and zubale uid
+  if ( uuid && uuid.includes('{"') ) {
+    let matches = text.match(/\{(.*?)\}/);
+    if (matches) {
+      let payload = JSON.parse(`{${matches[1]}}`);
+      uuid = payload.userId
+      phone = payload.phone
+    }
+  } else {
+    if ( uuid && uuid.includes('-')){
+      let uuid_parts = uuid.split('-')
+      uuid = uuid_parts[uuid_parts.length-1]; // remove the device brand
+    }
+    if ( uuid && uuid.includes('(')){
+      uuid = uuid.replace('(', '').replace(')', ''); // remove brackets
+    }
   }
 
-  console.log('FINALLY', { uuid })
+  console.log('FINALLY', { uuid, phone })
 
   const device = {
     device_id: uuid || deviceId || 'UNKNOWN',
@@ -151,6 +162,7 @@ export const findOrCreate = async (
       company_token: org,
       device_id: device.device_id,
       device_model: device.device_model,
+      phone,
       created_at: now,
       framework,
       version,
