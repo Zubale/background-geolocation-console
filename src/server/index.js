@@ -58,6 +58,10 @@ app.use(bodyParser.raw(parserLimits));
   }
 
   app.use((req, res, next) => {
+   res.setHeader('Access-Control-Allow-Origin', '*');
+   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+   res.setHeader('Access-Control-Allow-Headers', '*');
+
     const ext = extname(req.url);
     console.log('req.url', req.url, {
       ext,
