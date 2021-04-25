@@ -14,7 +14,7 @@
     "migrate": "babel-node ./src/server/database/migrate.js"
   },
   "engines": {
-    "node": "14.6.0"
+    "node": "12.18.0"
   },
   "type": "commonjs",
   "author": "Chris Scott, Transistor Software",
@@ -83,7 +83,7 @@
     "google-map-react": "^1.1.4",
     "jsonwebtoken": "^8.5.1",
     "keypair": "^1.0.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "morgan": "^1.9.1",
     "node-forge": "^0.9.1",
     "opn": "^5.1.0",
