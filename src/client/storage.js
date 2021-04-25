@@ -7,7 +7,7 @@ import { type Tab } from 'reducer/state';
 import { type AuthInfo, type AuthSettings } from 'reducer/types';
 import cloneState from 'utils/cloneState';
 import axios from 'axios'
-import _ from 'lodash'
+import get from 'lodash/get';
 
 export type StoredSettings = {|
   activeTab: Tab,
@@ -146,7 +146,7 @@ export async function getUrlSettings(): $Shape<StoredSettings> {
       console.log({error})
     }
   }
-  if ( _.get(quest, 'pickingAndDelivery', false) && _.get(quest, 'reservation.userId', '') ) {
+  if ( get(quest, 'pickingAndDelivery', false) && get(quest, 'reservation.userId', '') ) {
     result.deviceId = quest.reservation.userId
     result.startDate = new Date(quest.pickingAndDelivery.pickupWindowStartTime)
     result.endDate = new Date(quest.pickingAndDelivery.deliveryWindowEndTime)
