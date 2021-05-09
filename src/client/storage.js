@@ -138,7 +138,6 @@ export async function getUrlSettings(): $Shape<StoredSettings> {
   console.log('result.token is', result.token)
   if ( result.token ) {
     try {
-      console.log('before graphql')
       try {
         const response = await axios.post(`${API_URL}/quest/token`, {token: result.token})
         quest = response.data.data.quest
@@ -147,13 +146,13 @@ export async function getUrlSettings(): $Shape<StoredSettings> {
         console.error('token error', e);
       }
       console.log('quest is', quest)
+      console.log('events is', events)
 
     } catch (error) {
       console.log({error})
     }
   }
-  // /jobs/events?type=delivery&platorm=walmart&id=order_id
-  if ( get(quest, 'pickingAndDelivery', false) && get(quest, 'reservation.userId', false) ) {
+  if ( get(quest, 'pickingAndDelivery', false) ) {
     result.quest = quest
     result.events = events
     let startTime = quest.pickingAndDelivery.pickupWindowStartTime
@@ -166,8 +165,7 @@ export async function getUrlSettings(): $Shape<StoredSettings> {
       entdTime = events['AT_DROPOFF'].created_at
       console.log('we have AT_DROPOFF', entdTime)
     }
-
-    result.deviceId = quest.reservation.userId
+    result.deviceId = events['TASK_ASSIGNED'].payload.shopperDetails.id
     result.startDate = new Date(startTime) //.replace('15:00', '12:00'))
     result.endDate = new Date(entdTime) //.replace('21:00', '20:41'))
     console.log('quest.pickingAndDelivery.pickupWindowStartTime', result.startDate)

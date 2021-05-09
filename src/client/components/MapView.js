@@ -118,7 +118,7 @@ class MapView extends Component<Props, MapState> {
       return;
     }
     if (this.gmap) {
-      if (locations.length > 1) {
+      // if (locations.length > 1 || locations.length === 0) {
         const bounds = new google.maps.LatLngBounds();
         locations.forEach((location: Location) => {
           bounds.extend(new google.maps.LatLng(location.latitude, location.longitude));
@@ -131,10 +131,10 @@ class MapView extends Component<Props, MapState> {
           bounds.extend(new google.maps.LatLng(quest.pickingAndDelivery.dropOffLocation.latitude, quest.pickingAndDelivery.dropOffLocation.longitude));
         }
         this.gmap.fitBounds(bounds);
-      } else if (locations.length === 1) {
-        const [location] = locations;
-        this.gmap.setCenter(new google.maps.LatLng(location.latitude, location.longitude));
-      }
+      // } else if (locations.length === 1) {
+      //   const [location] = locations;
+      //   this.gmap.setCenter(new google.maps.LatLng(location.latitude, location.longitude));
+      // }
       // if (locations.length > 0) {
       //   const location = currentLocation || locations[0];
       //   console.log('location', location)
@@ -556,6 +556,7 @@ class MapView extends Component<Props, MapState> {
 
       let motionChangePosition = null;
       let searchingForMotionChange = false;
+      console.log({simpleUI})
 
       // Iterate in reverse order to create polyline points from oldest->latest.
       // We DO NOT want this.props.locations.reverse()!!!
@@ -647,7 +648,11 @@ class MapView extends Component<Props, MapState> {
 
     if ( quest ) {
       if (document.getElementById("storeContainer")) {
-        document.getElementById("storeContainer").innerHTML = this.getSvgMarker(quest.store.retailer.logoUrl);
+        document.getElementById("storeContainer").innerHTML = 
+        `<div class="tooltip">
+          Ubicación de la tienda ${quest.store.retailer.company.name} ${quest.store.retailer.name} ${quest.store.name}
+        </div>` + 
+        this.getSvgMarker(quest.store.retailer.logoUrl);
       }
 
       // let marker = this.buildLocationMarker(quest.location, { map: this.gmap });
@@ -759,13 +764,14 @@ class MapView extends Component<Props, MapState> {
         className='map'
         center={center}
         zoom={17}
-        layerTypes={['TrafficLayer', 'TransitLayer']}
+        layerTypes={['TrafficLayer']}
         onGoogleApiLoaded={this.onMapLoaded}
       >
         {quest && [
           <div
             id={'storeContainer'}
             key={'storeContainer'}
+            className={'tooltipContainer'}
             data-tip={`Ubicacieon de la tienda ${quest.store.retailer.name}`} data-for='storeInfo'
             lat={quest.location.latitude}
             lng={quest.location.longitude}
@@ -773,10 +779,14 @@ class MapView extends Component<Props, MapState> {
           <div
             id={'dropOffContainer'}
             key={'dropOffContainer'}
+            className={'tooltipContainer'}
             data-tip="Ubicación del cliente" data-for='dropOffInfo'
             lat={quest.pickingAndDelivery.dropOffLocation.latitude}
             lng={quest.pickingAndDelivery.dropOffLocation.longitude}
           >
+            <div className={'tooltip'}>
+              {quest.pickingAndDelivery.customerInfo.name}
+            </div>
             <img src="images/client.svg" style={{width: 43, height: 58, position: 'absolute', top: -58, left: -21}}/>
           </div>
         ]
@@ -786,6 +796,7 @@ class MapView extends Component<Props, MapState> {
           <div
             id={'currentLocation'}
             key={'currentLocation'}
+            className={'tooltipContainer'}
             data-tip="Ubicación del paquete en ruta" data-for='zubaleroInfo'
             lat={currentLocation.latitude}
             lng={currentLocation.longitude}
@@ -834,6 +845,8 @@ const mapStateToProps = (state: GlobalState) => {
   const { dashboard } = state;
   const locations = filteredLocationSelector(state)
   const currentLocation = locations[0] //dashboard.currentLocation || (locations.length > 0 ? locations[0] :)
+  console.log('QUEST IS', dashboard.quest)
+  console.log('SIMPLE IS', !!dashboard.quest)
   return {
     state,
     locations,

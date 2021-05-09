@@ -155,17 +155,19 @@ const Viewport = ({
             has_token ? 
               <div className={''} style={{padding: 20, maxWidth: 500,}}>
                 <h3>DETALLES DE LA ORDEN</h3>
-                {
-                  details.map((detail, index) => 
-                  <div style={{marginBottom: 1, width: '100%', display: 'flex', backgroundColor: index % 2 ? '#ffffff' : '#f0f0f0', padding: 7}}>
-                    <div style={{width: 140, fontSize: 14}}>
-                      <b>{detail.title.toUpperCase()}</b>
-                    </div>
-                    <div style={{display: 'flex', flex: 1}}>
-                    {detail.value}
-                    </div>
-                  </div>)
-                }
+                <div style={{background: '#dadada', borderRadius: 19, overflow: 'hidden', border: 'solid 12px #d8d8d8'}}>
+                  {
+                    details.map((detail, index) => 
+                    <div style={{marginBottom: 1, width: '100%', display: 'flex', backgroundColor: index % 2 ? '#ffffff' : '#f7f7f7', padding: 7}}>
+                      <div style={{width: 140, fontSize: 14}}>
+                        <b>{detail.title.toUpperCase()}</b>
+                      </div>
+                      <div style={{display: 'flex', flex: 1}}>
+                      {detail.value}
+                      </div>
+                    </div>)
+                  }
+                </div>
               </div>
             :
             [

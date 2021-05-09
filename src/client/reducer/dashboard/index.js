@@ -391,10 +391,12 @@ export const loadOrgTokens = (): ThunkAction => async (dispatch: Dispatch, getSt
 };
 
 export const loadDevices = (): ThunkAction => async (dispatch: Dispatch, getState: GetState): Promise<void> => {
-  const { dashboard: { companyId, orgToken }, auth } = getState();
+  const { dashboard: { companyId, orgToken, deviceId }, auth } = getState();
   const params = qs.stringify({
     company_id: companyId,
     company_token: orgToken,
+    device_id: deviceId,
+
   });
   try {
     const headers = makeHeaders(auth);
@@ -476,9 +478,9 @@ export const reload =
   ({ loadUsers }: LoadParams = { loadUsers: true }): ThunkAction => async (dispatch: Dispatch): Promise<void> => {
     await dispatch(setIsLoading(true));
     loadUsers && await dispatch(loadOrgTokens());
-    await dispatch(autoselectOrInvalidateSelectedOrgToken());
+    loadUsers && await dispatch(autoselectOrInvalidateSelectedOrgToken());
     loadUsers && await dispatch(loadDevices());
-    await dispatch(autoselectOrInvalidateSelectedDevice());
+    loadUsers && await dispatch(autoselectOrInvalidateSelectedDevice());
     await dispatch(loadLocations());
     await dispatch(loadCurrentLocation());
     await dispatch(invalidateSelectedLocation());
@@ -506,7 +508,12 @@ export const loadInitialData =
     // set a timer as a side effect
     let quest = getState().dashboard.quest
     console.log('dashboard quest ', quest)
-    setTimeout(() => dispatch(reload({ loadUsers: false })), quest ? 15 : 150 * 1000);
+    let loadEvery = (quest ? 15 : 150) * 1000
+    console.log({loadEvery})
+    setInterval(() => {
+      dispatch(reload({ loadUsers: false }))
+    }, loadEvery);
+    // setTimeout(() => dispatch(reload({ loadUsers: false })), loadEvery);
     GA.sendEvent('tracker', `load:${id}`);
   };
 

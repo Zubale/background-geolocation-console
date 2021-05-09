@@ -53,12 +53,13 @@ router.get('/devices', checkAuth(verify), async (req, res) => {
     companyId: orgId,
     org,
   } = req.jwt;
-  const { company_id: companyId } = req.query;
+  const { company_id: companyId, device_id: deviceId } = req.query;
   const admin = isAdmin(req.jwt);
   try {
     const devices = await getDevices(
       {
         companyId: admin ? companyId : orgId,
+        deviceId,
         org,
       },
       isAdmin(req.jwt),
@@ -352,139 +353,160 @@ router.post('/quest/token', async (req, res) => {
   })
 
     let error = null
-    let data = null
+    let data = {}
 
-    try {
-      console.log('GRAPHQL ready in try')
-      const response = await graphqlClient.post(CONSTANTS.QUEST_GRAPHQL, {
-        query: `
-          {
-            getQuest(id: "${token}") {
-            deliveryDistance
-            id
-            type
-            duration
-            rewardAmount
-            cycle {
-              endDate
-              startDate
-            }
-            location {
-              latitude
-              longitude
-            }
-            brand {
-                id
-                name
-                zubaleId
-            }
-            storeDepartment
-            store {
-                id
-                address
-                name
-                storeNumber
-                retailer {
-                    id
-                    name
-                    logoUrl
-                }
-                mapUrl
-            }
-            country {
-              currencySymbol
-            }
-            closed
-            status
-            userTypes
-            available
-            reservationOrder
-            reservationType
-            formType
-            formInfo {
-              formId
-              phoneNumberFieldKey
-              questFieldKey
-              storeFieldKey
-              url
-              validGoogleForm
-              validZubaleForm                  
-            }
-            reservation {
-              date
-              expirationDate
-              userId
-            }
-            pickingAndDelivery {
-              checkoutNote
-              zubaleOrderId
-              deepLinkBaseUrl
-              deliveryWindowEndTime
-              deliveryWindowStarTime
-              dropOffLocation {
-                latitude
-                longitude
-              }
-              encryptedToken
-              externalDeliveryId
-              externalOrderId
-              pickupWindowEndTime
-              pickupWindowStartTime
-              storeArrivalTime
-              customerInfo {
-                address
-                name
-                phoneNumber
-              }
-              orderInfo {
-                size
-                totalLineItems
-                totalQuantity
-                totalVolume
-                totalWeight
-              }
-              paymentInfo {
-                payOnDeliveryType
-                paymentMode
-                paymentStatus
-              }
-              allowResubmission
-            }
-          }
-        }
-        `,
-        variables: null,
-        operationName: null,
-      })
-    // console.log('GRAPHQL raw response', response)
-    if (response.data && response.data.errors) {
-      error = {
-        message: 'Token inválido...',
-        type: 'general',
-      }
-    } else {
-      data = {quest: response.data.data.getQuest, events: {}}
+  //   try {
+  //     console.log('GRAPHQL ready in try')
+  //     const response = await graphqlClient.post(CONSTANTS.QUEST_GRAPHQL, {
+  //       query: `
+  //         {
+  //           getQuest(id: "${token}") {
+  //           deliveryDistance
+  //           id
+  //           type
+  //           duration
+  //           rewardAmount
+  //           cycle {
+  //             endDate
+  //             startDate
+  //           }
+  //           location {
+  //             latitude
+  //             longitude
+  //           }
+  //           brand {
+  //               id
+  //               name
+  //               zubaleId
+  //           }
+  //           storeDepartment
+  //           store {
+  //               id
+  //               address
+  //               name
+  //               storeNumber
+  //               retailer {
+  //                   id
+  //                   name
+  //                   logoUrl
+  //               }
+  //               mapUrl
+  //           }
+  //           country {
+  //             currencySymbol
+  //           }
+  //           closed
+  //           status
+  //           userTypes
+  //           available
+  //           reservationOrder
+  //           reservationType
+  //           formType
+  //           formInfo {
+  //             formId
+  //             phoneNumberFieldKey
+  //             questFieldKey
+  //             storeFieldKey
+  //             url
+  //             validGoogleForm
+  //             validZubaleForm                  
+  //           }
+  //           reservation {
+  //             date
+  //             expirationDate
+  //             userId
+  //           }
+  //           pickingAndDelivery {
+  //             checkoutNote
+  //             zubaleOrderId
+  //             deepLinkBaseUrl
+  //             deliveryWindowEndTime
+  //             deliveryWindowStarTime
+  //             dropOffLocation {
+  //               latitude
+  //               longitude
+  //             }
+  //             encryptedToken
+  //             externalDeliveryId
+  //             externalOrderId
+  //             pickupWindowEndTime
+  //             pickupWindowStartTime
+  //             storeArrivalTime
+  //             customerInfo {
+  //               address
+  //               name
+  //               phoneNumber
+  //             }
+  //             orderInfo {
+  //               size
+  //               totalLineItems
+  //               totalQuantity
+  //               totalVolume
+  //               totalWeight
+  //             }
+  //             paymentInfo {
+  //               payOnDeliveryType
+  //               paymentMode
+  //               paymentStatus
+  //             }
+  //             allowResubmission
+  //           }
+  //         }
+  //       }
+  //       `,
+  //       variables: null,
+  //       operationName: null,
+  //     })
+  //   // console.log('GRAPHQL raw response', response)
+  //   if (response.data && response.data.errors) {
+  //     error = {
+  //       message: 'Token inválido...',
+  //       type: 'general',
+  //     }
+  //   } else {
+  //     data = {quest: response.data.data.getQuest, events: {}}
 
-      const responseWally = await zubaleClient().get(`jobs/events?type=delivery&platform=${String(data.quest.type.split('_')[0]).toLowerCase()}&id=${data.quest.pickingAndDelivery.externalOrderId}`, {})
+  //     const responseWally = await zubaleClient().get(`jobs/events?quest_id=${data.quest.id}`, {})
+  //     .catch((response) => {
+  //       console.log('error responseWally', response)
+  //       return response
+  //       return (error = err.response.data.errors)
+  //     })
+  //     console.log('responseWally', responseWally.data)
+  //     if (responseWally.data && responseWally.data.data && responseWally.data.data.events) {
+  //       const eventsRaw = responseWally.data.data.events
+  //       data.wally = responseWally.data.data
+  //       let events = {}
+  //       const ignoredStatus = ['APPROVED', 'DELIVERY_COMPLETED', 'SUBMITTED']
+  //       eventsRaw.map(event => {
+  //         if ( !ignoredStatus.includes(event.payload.status) )
+  //           events[event.payload.status] = {...event, event: undefined}
+  //       })
+  //       quest = events.READY.created_quest
+  //       data.events = events
+  //     }
+  //   }
+  // } catch (err) {
+  //   console.log('response Token inválido', err)
+  //   error = err
+  // }
+  const responseWally = await zubaleClient().get(`jobs/events?quest_id=${token}`, {})
       .catch((response) => {
         console.log('error responseWally', response)
         return response
-        return (error = err.response.data.errors)
       })
-      if (responseWally.data && responseWally.data.data && responseWally.data.data.events) {
-        const eventsRaw = responseWally.data.data.events
-        let events = {}
-        const ignoredStatus = ['APPROVED', 'DELIVERY_COMPLETED', 'SUBMITTED']
-        eventsRaw.map(event => {
-          if ( !ignoredStatus.includes(event.payload.status) )
-            events[event.payload.status] = {...event, event: undefined}
-        })
-        data.events = events
-      }
-    }
-  } catch (err) {
-    console.log('response Token inválido', err)
-    error = err
+  console.log('responseWally', responseWally.data)
+  if (responseWally.data && responseWally.data.data && responseWally.data.data.events) {
+    const eventsRaw = responseWally.data.data.events
+    // data.wally = responseWally.data.data
+    let events = {}
+    const ignoredStatus = ['APPROVED', 'DELIVERY_COMPLETED', 'SUBMITTED']
+    eventsRaw.map(event => {
+      if ( !ignoredStatus.includes(event.payload.status) )
+        events[event.payload.status] = {...event, event: undefined}
+    })
+    data.quest = events.READY.payload.created_quest
+    data.events = events
   }
 
   return res.send({data, error,});

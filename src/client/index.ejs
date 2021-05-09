@@ -16,6 +16,36 @@
 			.org-token-dialog .ReactVirtualized__Grid__innerScrollContainer {
 				max-width: none !important;
 			}
+			.tooltip {
+				position: absolute;
+				bottom: 62px;
+				padding: 5px;
+				left: -62px;
+				width: 120px;
+				background: white;
+				text-align: center;
+				font-size: 14px;
+				font-weight: 700;
+			}
+			.tooltipContainer {
+				-webkit-transition: all 0.2s;
+				-moz-transition: all 0.2s;
+				-o-transition: all 0.2s;
+				transition: all 0.2s;
+
+				-webkit-transform: scale(1);
+				-moz-transform: scale(1);
+				-o-transform: scale(1);
+				-ms-transform: scale(1);
+				transform: scale(1);
+			}
+			.tooltipContainer:hover, .tooltipContainer:active {
+				-webkit-transform: scale(1.1);
+				-moz-transform: scale(1.1);
+				-o-transform: scale(1.1);
+				-ms-transform: scale(1.1);
+				transform: scale(1.1);
+			}
 		</style>
 
 	<!-- Google Analytics -->
