@@ -177,7 +177,7 @@ router.post('/locations', getAuth(verify), async (req, res) => {
 
   try {
     await create(data, org);
-    await removeOld(org);
+    // await removeOld(org);
     return res.send({ success: true });
   } catch (err) {
     if (err instanceof AccessDeniedError) {
