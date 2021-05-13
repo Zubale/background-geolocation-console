@@ -163,6 +163,7 @@ export async function createLocations(
 }
 
 export async function removeOld(org) {
+  return
   if (org) {
     org = org.org || org;
   }
