@@ -80,8 +80,10 @@ const Viewport = ({
       if ( events['TASK_ASSIGNED'] ) {
         let event = events['TASK_ASSIGNED']
         let {shopperDetails} = event.payload
-        details.push({title: 'Repartidor', value: `${shopperDetails.firstName} ${shopperDetails.lastName}`})
-        details.push({title: 'Vehículo del repartidor', value: `${shopperDetails.vehicle.model} ${shopperDetails.vehicle.licensePlateNumber} ${shopperDetails.vehicle.year}`})
+        if ( shopperDetails.vehicle ) {
+          details.push({title: 'Repartidor', value: `${shopperDetails.firstName} ${shopperDetails.lastName}`})
+          details.push({title: 'Vehículo del repartidor', value: `${shopperDetails.vehicle.model} ${shopperDetails.vehicle.licensePlateNumber} ${shopperDetails.vehicle.year}`})
+        }
       }
     }
     
