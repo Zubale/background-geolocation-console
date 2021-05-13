@@ -24,6 +24,7 @@ import {
 import cloneState from 'utils/cloneState';
 
 import { API_URL } from '../../constants';
+import { string } from 'prop-types';
 
 export type Source = {|
   value: string,
@@ -89,6 +90,7 @@ export type DashboardState = {|
   orgTokens: OrgToken[],
   currentLocation: ?Location,
   deviceId: ?string,
+  device_id: ?string,
   devices: Device[],
   enableClustering: boolean,
   endDate: Date,
@@ -104,6 +106,7 @@ export type DashboardState = {|
   startDate: Date,
   testMarkers: Object,
   auth: AuthInfo,
+  token: ?string,
 |};
 
 // Action Types
@@ -423,7 +426,7 @@ export const loadDevices = (): ThunkAction => async (dispatch: Dispatch, getStat
 export const loadLocations = (): ThunkAction => async (dispatch: Dispatch, getState: GetState): Promise<void> => {
   const {
     dashboard: {
-      deviceId, orgToken, companyId, startDate, endDate, maxMarkers,
+      deviceId, device_id, orgToken, companyId, startDate, endDate, maxMarkers,
     },
     auth,
   } = getState();
@@ -432,7 +435,7 @@ export const loadLocations = (): ThunkAction => async (dispatch: Dispatch, getSt
   const params = qs.stringify({
     company_id: companyId,
     company_token: orgToken || companyId,
-    user_id: deviceId,
+    user_id: deviceId || device_id,
     end_date: endDate.toISOString(),
     limit: maxMarkers,
     start_date: startDate.toISOString(),
