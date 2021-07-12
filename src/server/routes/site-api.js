@@ -285,56 +285,54 @@ router.post('/auth', async (req, res) => {
     .send({ org: login, error: 'Await not public account and right password' });
 });
 
-const zubaleClient = () => {
+const zubaleClient = (staging = false) => {
   // pending caching expiration
-  const getMaxAge = (res) => res.expires_in * 1000 // expires_in is seconds
-  const interceptor = (getToken) => {
+  const getMaxAge = (res) => res.expires_in * 1000; // expires_in is seconds
+  const interceptor = getToken => {
     return async (config) => {
-      let current = null
-      const now = Date.now()
-      const token = await getToken()
-      // console.log(`got from server(${JSON.stringify(token)})`)
+      let current = null;
+      const now = Date.now();
+      const token = await getToken();
       current = {
         token: token.access_token,
         // pending caching expiration
         expiration: Date.now() + getMaxAge(token),
-      }
-      config.headers['Authorization'] = `Bearer ${current.token}`
+      };
+      config.headers['Authorization'] = `Bearer ${current.token}`;
       // console.log('new config', config)
-      return config
-    }
-  }
+      return config;
+    };
+  };
 
   const client = (url, data, config) => {
     return () => axios.post(url, data, config).then((res) => res.data)
-  }
+  };
+
+  const username = staging ? '4038d1d7be531d108fc461af0035b1d2' : 'y7FBQItecB52ztGHISATBVUB7rKlkmCH';
+  const password = staging ? 'd3df3d15a18f78080be540b419699504' : 'iB2zwXQS47ZVqM0CBBYmMTEn2GRpvFbC';
+  const url = staging ? 'https://api-stag.zubale.com/' : 'https://api.zubale.com/';
 
   const apiClient = axios.create({
-    baseURL: 'https://api.zubale.com/',
+    baseURL: url,
     timeout: 10000,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+    headers: { 'Content-Type': 'application/json' },
+  });
   const getClientCredentials = client(
-    `https://api.zubale.com/oauth2/token`,
-    {
-      grant_type: 'client_credentials',
-    },
+    `${url}oauth2/token`,
+    { grant_type: 'client_credentials' },
     {
       auth: {
-        username: 'y7FBQItecB52ztGHISATBVUB7rKlkmCH',
-        password: 'iB2zwXQS47ZVqM0CBBYmMTEn2GRpvFbC',
+        username,
+        password,
       },
     },
-  )
-  apiClient.interceptors.request.use(interceptor(getClientCredentials))
-  return apiClient
-}
-
+  );
+  apiClient.interceptors.request.use(interceptor(getClientCredentials));
+  return apiClient;
+};
 
 router.post('/quest/token', async (req, res) => {
-  const { token } = req.body || {};
+  const { token, staging } = req.body || {};
 
   const CONSTANTS = {
     GRAPHQL_USERNAME: 'graphql',
@@ -492,11 +490,11 @@ router.post('/quest/token', async (req, res) => {
   //   console.log('response Token inválido', err)
   //   error = err
   // }
-  const responseWally = await zubaleClient().get(`jobs/events?quest_id=${token}`, {})
-      .catch((response) => {
-        console.log('error responseWally', response)
-        return response
-      })
+  const responseWally = await zubaleClient(staging).get(`jobs/events?quest_id=${token}`, {})
+    .catch((response) => {
+      console.log('error responseWally', response);
+      return response
+    });
   console.log('responseWally', responseWally.data)
   if (responseWally.data && responseWally.data.data && responseWally.data.data.events) {
     const eventsRaw = responseWally.data.data.events
@@ -517,6 +515,20 @@ router.post('/quest/token', async (req, res) => {
   }
 
   return res.send({data, error,});
+});
+
+router.post('/deliveries', async (req, res) => {
+  let body = req.body || {};
+  const { staging } = body;
+  delete body.staging;
+
+  const responseWally = await zubaleClient(staging).post('deliveries', body)
+    .catch((response) => {
+      console.log('error responseWally', response);
+      return response;
+    });
+  console.log('responseWally', responseWally.data);
+  res.send(responseWally.data)
 });
 
 router.get('/location/user/:user_id', async (req, res) => {
