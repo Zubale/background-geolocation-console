@@ -42,14 +42,15 @@ app.use(compress());
 app.use(bodyParser.json(parserLimits));
 app.use(bodyParser.raw(parserLimits));
 
-const whitelist = ['https://tracking.zubale.com', 'https://control-tower-web.zubale.com/', 'https://control-tower.zubale.com/', 'https://delivery.zubale.com/'];
+const whitelist = ['http://localhost:3000', 'https://tracking.zubale.com', 'https://control-tower-web.zubale.com/', 'https://control-tower.zubale.com/', 'https://delivery.zubale.com/'];
 var corsOptions = {
   origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
+    // if (whitelist.indexOf(origin) !== -1) {
+    //   callback(null, true)
+    // } else {
+    //   callback(new Error('Not allowed by CORS'))
+    // }
+    callback(null, true)
   }
 }
 app.use(cors(corsOptions));
